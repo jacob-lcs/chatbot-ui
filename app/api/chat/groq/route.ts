@@ -1,8 +1,8 @@
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
-import { OpenAIStream, StreamingTextResponse } from "ai"
-import OpenAI from "openai"
+import { streamText } from "ai"
+import { createGroq } from "@ai-sdk/groq"
 
 export const runtime = "edge"
 export async function POST(request: Request) {
@@ -18,24 +18,18 @@ export async function POST(request: Request) {
     checkApiKey(profile.groq_api_key, "G")
 
     // Groq is compatible with the OpenAI SDK
-    const groq = new OpenAI({
-      apiKey: profile.groq_api_key || "",
-      baseURL: "https://api.groq.com/openai/v1"
+    const groq = createGroq({
+      apiKey: profile.groq_api_key || ""
     })
 
-    const response = await groq.chat.completions.create({
-      model: chatSettings.model,
+    const response = await streamText({
+      model: groq(chatSettings.model),
       messages,
-      max_tokens:
-        CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
-      stream: true
+      maxTokens: CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH
     })
-
-    // Convert the response into a friendly text-stream.
-    const stream = OpenAIStream(response)
 
     // Respond with the stream
-    return new StreamingTextResponse(stream)
+    return response.toTextStreamResponse()
   } catch (error: any) {
     let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500

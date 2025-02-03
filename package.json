@@ -26,12 +26,20 @@
     "test": "jest"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.18.0",
+    "@ai-sdk/anthropic": "^1.1.6",
+    "@ai-sdk/azure": "^1.1.9",
+    "@ai-sdk/deepseek": "^0.1.7",
+    "@ai-sdk/groq": "^1.1.7",
+    "@ai-sdk/mistral": "^1.1.6",
+    "@ai-sdk/openai": "^1.1.9",
+    "@ai-sdk/perplexity": "^0.0.5",
+    "@ai-sdk/ui-utils": "^1.1.8",
     "@apidevtools/json-schema-ref-parser": "^11.1.0",
     "@azure/openai": "^1.0.0-beta.8",
     "@google/generative-ai": "^0.11.4",
     "@hookform/resolvers": "^3.3.2",
     "@mistralai/mistralai": "^0.0.8",
+    "@openrouter/ai-sdk-provider": "^0.0.6",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-aspect-ratio": "^1.0.3",
@@ -62,10 +70,9 @@
     "@supabase/ssr": "^0.0.10",
     "@supabase/supabase-js": "^2.38.4",
     "@tabler/icons-react": "^2.40.0",
-    "@vercel/analytics": "^1.1.1",
     "@vercel/edge-config": "^0.4.1",
     "@xenova/transformers": "^2.13.4",
-    "ai": "^2.2.31",
+    "ai": "^4.1.17",
     "class-variance-authority": "^0.7.0",
     "cmdk": "^0.2.0",
     "d3-dsv": "^2.0.0",
@@ -125,5 +132,6 @@
     "tailwindcss-animate": "^1.0.7",
     "ts-node": "^10.9.2",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0"
 }

@@ -17,8 +17,10 @@ import {
   ChatPayload,
   ChatSettings,
   LLM,
-  MessageImage
+  MessageImage,
+  ModelProvider
 } from "@/types"
+import { callChatApi } from "@ai-sdk/ui-utils"
 import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
@@ -187,6 +189,17 @@ export const handleLocalChat = async (
   )
 }
 
+export const getApiEndpoint = (
+  provider: ModelProvider,
+  use_azure_openai: boolean
+) => {
+  const _provider =
+    provider === "openai" && use_azure_openai ? "azure" : provider
+  const apiEndpoint =
+    provider === "custom" ? "/api/chat/custom" : `/api/chat/${_provider}`
+  return apiEndpoint
+}
+
 export const handleHostedChat = async (
   payload: ChatPayload,
   profile: Tables<"profiles">,
@@ -194,7 +207,6 @@ export const handleHostedChat = async (
   tempAssistantChatMessage: ChatMessage,
   isRegeneration: boolean,
   newAbortController: AbortController,
-  newMessageImages: MessageImage[],
   chatImages: MessageImage[],
   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
@@ -218,8 +230,10 @@ export const handleHostedChat = async (
     formattedMessages = draftMessages
   }
 
-  const apiEndpoint =
-    provider === "custom" ? "/api/chat/custom" : `/api/chat/${provider}`
+  const apiEndpoint = getApiEndpoint(
+    modelData.provider,
+    profile.use_azure_openai
+  )
 
   const requestBody = {
     chatSettings: payload.chatSettings,

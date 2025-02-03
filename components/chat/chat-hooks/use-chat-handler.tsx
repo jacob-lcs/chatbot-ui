@@ -19,8 +19,10 @@ import {
   handleLocalChat,
   handleRetrieval,
   processResponse,
-  validateChatSettings
+  validateChatSettings,
+  getApiEndpoint
 } from "../chat-helpers"
+import { useChat } from "ai/react"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -68,6 +70,8 @@ export const useChatHandler = () => {
     isFilePickerOpen,
     isToolPickerOpen
   } = useContext(ChatbotUIContext)
+
+  const {} = useChat({})
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -328,7 +332,6 @@ export const useChatHandler = () => {
             tempAssistantChatMessage,
             isRegeneration,
             newAbortController,
-            newMessageImages,
             chatImages,
             setIsGenerating,
             setFirstTokenReceived,

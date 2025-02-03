@@ -1,7 +1,8 @@
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
-import { OpenAIStream, StreamingTextResponse } from "ai"
-import OpenAI from "openai"
+import { createDeepSeek } from "@ai-sdk/deepseek"
+import { createOpenAI } from "@ai-sdk/openai"
+import { streamText } from "ai"
 
 export const runtime = "edge"
 
@@ -17,24 +18,37 @@ export async function POST(request: Request) {
 
     checkApiKey(profile.siliconflow_api_key, "siliconFlow")
 
-    // siliconFlow is compatible with the OpenAI SDK
-    const siliconFlow = new OpenAI({
-      apiKey: profile.siliconflow_api_key || "",
-      baseURL: "https://api.siliconflow.cn/v1"
-    })
+    if (chatSettings.model.toLowerCase().includes("deepseek")) {
+      const deepseek = createDeepSeek({
+        baseURL: "https://api.siliconflow.cn/v1",
+        apiKey: profile.siliconflow_api_key || ""
+      })
 
-    const response = await siliconFlow.chat.completions.create({
-      model: chatSettings.model,
-      messages,
-      temperature: chatSettings.temperature,
-      stream: true
-    })
+      const response = await streamText({
+        model: deepseek(chatSettings.model),
+        messages,
+        temperature: chatSettings.temperature
+      })
 
-    // Convert the response into a friendly text-stream.
-    const stream = OpenAIStream(response)
+      return response.toDataStreamResponse({
+        sendReasoning: true
+      })
+    } else {
+      // siliconFlow is compatible with the OpenAI SDK
+      const siliconFlow = createOpenAI({
+        apiKey: profile.siliconflow_api_key || "",
+        baseURL: "https://api.siliconflow.cn/v1"
+      })
 
-    // Respond with the stream
-    return new StreamingTextResponse(stream)
+      const response = await streamText({
+        model: siliconFlow(chatSettings.model),
+        messages,
+        temperature: chatSettings.temperature
+      })
+
+      // Respond with the stream
+      return response.toTextStreamResponse()
+    }
   } catch (error: any) {
     let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500

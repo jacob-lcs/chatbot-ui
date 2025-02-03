@@ -85,7 +85,19 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     if (!isTyping && event.key === "Enter" && !event.shiftKey) {
       event.preventDefault()
       setIsPromptPickerOpen(false)
-      handleSendMessage(userInput, chatMessages, false)
+      handleSendMessage(
+        userInput,
+        chatMessages.map(msg => ({
+          ...msg,
+          message: {
+            ...msg.message,
+            content: msg.message.content.includes("</think>")
+              ? msg.message.content.split("</think>")[1]
+              : msg.message.content
+          }
+        })),
+        false
+      )
     }
 
     // Consolidate conditions to avoid TypeScript error
@@ -268,8 +280,19 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               )}
               onClick={() => {
                 if (!userInput) return
-
-                handleSendMessage(userInput, chatMessages, false)
+                handleSendMessage(
+                  userInput,
+                  chatMessages.map(msg => ({
+                    ...msg,
+                    message: {
+                      ...msg.message,
+                      content: msg.message.content.includes("</think>")
+                        ? msg.message.content.split("</think>")[1]
+                        : msg.message.content
+                    }
+                  })),
+                  false
+                )
               }}
               size={30}
             />

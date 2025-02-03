@@ -2,8 +2,8 @@ import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { getBase64FromDataURL, getMediaTypeFromDataURL } from "@/lib/utils"
 import { ChatSettings } from "@/types"
-import Anthropic from "@anthropic-ai/sdk"
-import { AnthropicStream, StreamingTextResponse } from "ai"
+import { streamText } from "ai"
+import { createAnthropic } from "@ai-sdk/anthropic"
 import { NextRequest, NextResponse } from "next/server"
 
 export const runtime = "edge"
@@ -55,24 +55,22 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    const anthropic = new Anthropic({
+    const anthropic = createAnthropic({
       apiKey: profile.anthropic_api_key || ""
     })
 
     try {
-      const response = await anthropic.messages.create({
-        model: chatSettings.model,
+      const response = await streamText({
+        model: anthropic(chatSettings.model),
         messages: ANTHROPIC_FORMATTED_MESSAGES,
         temperature: chatSettings.temperature,
         system: messages[0].content,
-        max_tokens:
-          CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
-        stream: true
+        maxTokens:
+          CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH
       })
 
       try {
-        const stream = AnthropicStream(response)
-        return new StreamingTextResponse(stream)
+        return response.toTextStreamResponse()
       } catch (error: any) {
         console.error("Error parsing Anthropic API response:", error)
         return new NextResponse(
