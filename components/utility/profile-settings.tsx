@@ -118,6 +118,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     profile?.openrouter_api_key || ""
   )
 
+  const [siliconFlowAPIKey, setSiliconFlowAPIKey] = useState(
+    profile?.siliconflow_api_key || ""
+  )
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/login")
@@ -157,7 +161,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       azure_openai_45_turbo_id: azureOpenai45TurboID,
       azure_openai_45_vision_id: azureOpenai45VisionID,
       azure_openai_embeddings_id: azureEmbeddingsID,
-      openrouter_api_key: openrouterAPIKey
+      openrouter_api_key: openrouterAPIKey,
+      siliconflow_api_key: siliconFlowAPIKey
     })
 
     setProfile(updatedProfile)
@@ -719,6 +724,22 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       type="password"
                       value={openrouterAPIKey}
                       onChange={e => setOpenrouterAPIKey(e.target.value)}
+                    />
+                  </>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                {envKeyMap["siliconflow"] ? (
+                  <Label>SiliconFlow API key set by admin.</Label>
+                ) : (
+                  <>
+                    <Label>SiliconFlow API Key</Label>
+                    <Input
+                      placeholder="SiliconFlow API Key"
+                      type="password"
+                      value={siliconFlowAPIKey}
+                      onChange={e => setSiliconFlowAPIKey(e.target.value)}
                     />
                   </>
                 )}

@@ -62,9 +62,25 @@ const GEMMA_7B_IT: LLM = {
   }
 }
 
+const DEEPSEEK_R1_DISTILL_70B: LLM = {
+  modelId: "deepseek-r1-distill-llama-70b",
+  modelName: "DeepSeek-R1-Distill-LLaMA-70B",
+  provider: "groq",
+  hostedId: "deepseek-r1-distill-llama-70b",
+  platformLink: GROQ_PLATORM_LINK,
+  imageInput: false,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 0.59,
+    outputCost: 0.79
+  }
+}
+
 export const GROQ_LLM_LIST: LLM[] = [
   LLaMA3_8B,
   LLaMA3_70B,
   MIXTRAL_8X7B,
-  GEMMA_7B_IT
+  GEMMA_7B_IT,
+  DEEPSEEK_R1_DISTILL_70B
 ]

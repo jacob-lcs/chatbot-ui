@@ -7,6 +7,7 @@ export type LLMID =
   | MistralLLMID
   | GroqLLMID
   | PerplexityLLMID
+  | SiliconflowLLMID
 
 // OpenAI Models (UPDATED 5/13/24)
 export type OpenAILLMID =
@@ -44,6 +45,7 @@ export type GroqLLMID =
   | "llama3-70b-8192" // LLaMA3-70b
   | "mixtral-8x7b-32768" // Mixtral-8x7b
   | "gemma-7b-it" // Gemma-7b IT
+  | "deepseek-r1-distill-llama-70b"
 
 // Perplexity Models (UPDATED 1/31/24)
 export type PerplexityLLMID =
@@ -60,6 +62,10 @@ export type PerplexityLLMID =
   | "sonar-small-online" // Sonar Small Online
   | "sonar-medium-chat" // Sonar Medium Chat
   | "sonar-medium-online" // Sonar Medium Online
+
+export type SiliconflowLLMID =
+  | "deepseek-ai/DeepSeek-R1"
+  | "deepseek-ai/DeepSeek-V3"
 
 export interface LLM {
   modelId: LLMID
