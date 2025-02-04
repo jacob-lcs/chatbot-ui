@@ -2,7 +2,8 @@ import { openapiToFunctions } from "@/lib/openapi-conversion"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
-import { OpenAIStream, StreamingTextResponse } from "ai"
+import { streamText } from "ai"
+import { createOpenAI } from "@ai-sdk/openai"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
 
@@ -19,9 +20,8 @@ export async function POST(request: Request) {
 
     checkApiKey(profile.openai_api_key, "OpenAI")
 
-    const openai = new OpenAI({
-      apiKey: profile.openai_api_key || "",
-      organization: profile.openai_organization_id
+    const openai = createOpenAI({
+      apiKey: profile.openai_api_key || ""
     })
 
     let allTools: OpenAI.Chat.Completions.ChatCompletionTool[] = []
@@ -59,23 +59,23 @@ export async function POST(request: Request) {
       }
     }
 
-    const firstResponse = await openai.chat.completions.create({
-      model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
-      messages,
-      tools: allTools.length > 0 ? allTools : undefined
+    const firstResponse = await streamText({
+      model: openai(chatSettings.model),
+      messages
+      // tools: allTools.length > 0 ? allTools : undefined
     })
 
-    const message = firstResponse.choices[0].message
-    messages.push(message)
-    const toolCalls = message.tool_calls || []
+    // const message = firstResponse.choices[0].message
+    // messages.push(message)
+    const toolCalls: any[] = []
 
-    if (toolCalls.length === 0) {
-      return new Response(message.content, {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-    }
+    // if (toolCalls.length === 0) {
+    //   return new Response(message.content, {
+    //     headers: {
+    //       "Content-Type": "application/json"
+    //     }
+    //   })
+    // }
 
     if (toolCalls.length > 0) {
       for (const toolCall of toolCalls) {
@@ -198,15 +198,12 @@ export async function POST(request: Request) {
       }
     }
 
-    const secondResponse = await openai.chat.completions.create({
-      model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
-      messages,
-      stream: true
+    const secondResponse = await streamText({
+      model: openai(chatSettings.model),
+      messages
     })
 
-    const stream = OpenAIStream(secondResponse)
-
-    return new StreamingTextResponse(stream)
+    return secondResponse.toDataStreamResponse()
   } catch (error: any) {
     console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"
