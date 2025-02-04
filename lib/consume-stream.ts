@@ -12,7 +12,7 @@ export async function consumeReadableStream(
     await processDataStream({
       stream,
       onTextPart: value => {
-        if (isFirstTextPart) {
+        if (isFirstTextPart && !isFirstReasoningPart) {
           isFirstTextPart = false
           callback("</think>" + value)
         } else {
